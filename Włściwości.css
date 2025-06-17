@@ -1,0 +1,40 @@
+body{
+    background-color: rgb(101, 165, 143);
+}
+
+#Kontener{
+    width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+#Logo{
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+#Nav{
+    float: left;
+    background-color: antiquewhite;
+    width: 140px;
+    min-height: 545px;
+    padding: 20px;
+}
+#Kontent{
+    float: left;
+    padding: 20px;
+    width: 600px;
+    background-color:rgba(68, 160, 199, 0.829);
+}
+#Reklama{
+    float: left;
+    width: 160px;margin: auto;
+    background-color: aqua;
+}
+#Stopka{
+    clear: both;
+    text-align: center;
+    background-color: black;
+    color: white;
+}
