@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Szyfry Kryptograficzne</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #f0f0f0;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #00d9ff;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #000;
+        }
+
+        select {
+            background-color: #00d9ff;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: none;
+            background: #f7f7f7;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 8px;
+            background-color: #00d9ff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #00b5cc;
+            transform: scale(1.05);
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff85;
+        }
+
+        .cipherInterface {
+            display: none;
+        }
+
+        #error {
+            color: #ff6767;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Wybierz Szyfr</h1>
+
+        <label for="cipherSelect">Rodzaj szyfru:</label>
+        <select id="cipherSelect" onchange="showCipherInterface()">
+            <option value="caesar">Szyfr Cezara</option>
+            <option value="polibius">Szyfr Polibiusza</option>
+            <option value="vigenere">Szyfr Vigenère'a</option>
+            <option value="playfair">Szyfr Playfair</option>
+        </select>
+
+        <div id="caesarInterface" class="cipherInterface">
+            <label for="caesarText">Tekst:</label>
+            <textarea id="caesarText" rows="4" placeholder="Wpisz tekst..."></textarea>
+            <label for="caesarShift">Przesunięcie:</label>
+            <input type="number" id="caesarShift" value="3">
+            <button onclick="caesarEncrypt()">Zaszyfruj</button>
+            <button onclick="caesarDecrypt()">Odszyfruj</button>
+        </div>
+
+        <div id="polibiusInterface" class="cipherInterface">
+            <label for="polibiusText">Tekst:</label>
+            <textarea id="polibiusText" rows="4" placeholder="Wpisz tekst..."></textarea>
+            <button onclick="polibiusEncrypt()">Zaszyfruj</button>
+            <button onclick="polibiusDecrypt()">Odszyfruj</button>
+        </div>
+
+        <div id="vigenereInterface" class="cipherInterface">
+            <label for="vigenereText">Tekst:</label>
+            <textarea id="vigenereText" rows="4" placeholder="Wpisz tekst..."></textarea>
+            <label for="vigenereKey">Klucz:</label>
+            <input type="text" id="vigenereKey" placeholder="Podaj klucz...">
+            <button onclick="vigenereEncrypt()">Zaszyfruj</button>
+            <button onclick="vigenereDecrypt()">Odszyfruj</button>
+        </div>
+
+        <div id="playfairInterface" class="cipherInterface">
+            <label for="playfairText">Tekst:</label>
+            <textarea id="playfairText" rows="4" placeholder="Wpisz tekst..."></textarea>
+            <label for="playfairKey">Klucz:</label>
+            <input type="text" id="playfairKey" placeholder="Podaj klucz...">
+            <button onclick="playfairEncrypt()">Zaszyfruj</button>
+            <button onclick="playfairDecrypt()">Odszyfruj</button>
+        </div>
+
+        <div id="error"></div>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        function showCipherInterface() {
+            const selectedCipher = document.getElementById("cipherSelect").value;
+            document.querySelectorAll('.cipherInterface').forEach(div => div.style.display = 'none');
+            document.getElementById(selectedCipher + "Interface").style.display = 'block';
+        }
+
+        function displayOutput(text) {
+            document.getElementById("output").innerText = "Wynik: " + text;
+        }
+
+        function displayError(message) {
+            document.getElementById("error").innerText = message;
+        }
+
+        // Szyfr Cezara
+        function caesarEncrypt() {
+            const text = document.getElementById("caesarText").value;
+            const shift = parseInt(document.getElementById("caesarShift").value);
+            displayOutput(caesarCipher(text, shift));
+        }
+
+        function caesarDecrypt() {
+            const text = document.getElementById("caesarText").value;
+            const shift = parseInt(document.getElementById("caesarShift").value);
+            displayOutput(caesarCipher(text, -shift));
+        }
+
+        function caesarCipher(text, shift) {
+            const alphabet = "abcdefghijklmnopqrstuvwxyz";
+            const alphabetUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let result = "";
+
+            for (let char of text) {
+                if (alphabet.includes(char)) {
+                    let newIndex = (alphabet.indexOf(char) + shift + 26) % 26;
+                    result += alphabet[newIndex];
+                } else if (alphabetUpper.includes(char)) {
+                    let newIndex = (alphabetUpper.indexOf(char) + shift + 26) % 26;
+                    result += alphabetUpper[newIndex];
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // Szyfr Polibiusza
+        function polibiusEncrypt() {
+            const text = document.getElementById("polibiusText").value.toUpperCase();
+            const square = [
+                ['A', 'B', 'C', 'D', 'E'],
+                ['F', 'G', 'H', 'I', 'K'],
+                ['L', 'M', 'N', 'O', 'P'],
+                ['Q', 'R', 'S', 'T', 'U'],
+                ['V', 'W', 'X', 'Y', 'Z']
+            ];
+            let result = "";
+
+            for (let char of text) {
+                if (char === 'J') char = 'I';
+                if (/[A-Z]/.test(char)) {
+                    for (let i = 0; i < 5; i++) {
+                        for (let j = 0; j < 5; j++) {
+                            if (square[i][j] === char) {
+                                result += (i + 1) + "" + (j + 1) + " ";
+                            }
+                        }
+                    }
+                } else {
+                    result += char;
+                }
+            }
+            displayOutput(result.trim());
+        }
+
+        function polibiusDecrypt() {
+            const text = document.getElementById("polibiusText").value.split(" ");
+            const square = [
+                ['A', 'B', 'C', 'D', 'E'],
+                ['F', 'G', 'H', 'I', 'K'],
+                ['L', 'M', 'N', 'O', 'P'],
+                ['Q', 'R', 'S', 'T', 'U'],
+                ['V', 'W', 'X', 'Y', 'Z']
+            ];
+            let result = "";
+
+            for (let pair of text) {
+                if (pair.length === 2) {
+                    const row = parseInt(pair[0]) - 1;
+                    const col = parseInt(pair[1]) - 1;
+                    result += square[row][col];
+                } else {
+                    result += pair;
+                }
+            }
+            displayOutput(result);
+        }
+
+        // Szyfr Vigenère'a
+        function vigenereEncrypt() {
+            const text = document.getElementById("vigenereText").value.toUpperCase();
+            const key = document.getElementById("vigenereKey").value.toUpperCase();
+            if (!key) return displayError("Podaj klucz!");
+            displayOutput(vigenereCipher(text, key, "encrypt"));
+        }
+
+        function vigenereDecrypt() {
+            const text = document.getElementById("vigenereText").value.toUpperCase();
+            const key = document.getElementById("vigenereKey").value.toUpperCase();
+            if (!key) return displayError("Podaj klucz!");
+            displayOutput(vigenereCipher(text, key, "decrypt"));
+        }
+
+        function vigenereCipher(text, key, mode) {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let result = "";
+            let keyIndex = 0;
+
+            for (let char of text) {
+                if (alphabet.includes(char)) {
+                    const shift = alphabet.indexOf(key[keyIndex % key.length]);
+                    const charIndex = alphabet.indexOf(char);
+                    let newIndex = mode === "encrypt"
+                        ? (charIndex + shift) % 26
+                        : (charIndex - shift + 26) % 26;
+                    result += alphabet[newIndex];
+                    keyIndex++;
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // Szyfr Playfair (prosty szablon)
+        function playfairEncrypt() {
+            displayOutput("Playfair: Funkcja w budowie");
+        }
+
+        function playfairDecrypt() {
+            displayOutput("Playfair: Funkcja w budowie");
+        }
+    </script>
+</body>
+</html>
